@@ -23,7 +23,7 @@
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-dialog v-model="dialogAdd" max-width="500px">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
+            <v-btn color="secondary" dark class="mb-2" v-bind="attrs" v-on="on">
               Nuevo Chofer
             </v-btn>
           </template>
@@ -40,18 +40,25 @@
                       <v-text-field
                         id="chofer_nombre"
                         v-model="newChofer.nombre"
+                        :counter="80"
+                        :rules="nombreRules"
                         label="Nombre del chofer*"
                         required
                       ></v-text-field>
                       <v-text-field
                         id="chofer_apellido"
                         v-model="newChofer.apellido"
+                        :counter="80"
+                        :rules="apellidoRules"
                         label="Apellido del chofer*"
                         required
                       ></v-text-field>
                       <v-text-field
                         id="chofer_dni"
                         v-model="newChofer.dni"
+                        type="number"
+                        :counter="10"
+                        :rules="dniRules"
                         label="DNI del chofer*"
                         required
                       ></v-text-field>
@@ -63,10 +70,15 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="closeAdd">
-                  Cancel
+                  Cancelar
                 </v-btn>
-                <v-btn color="blue darken-1" text @click="addChofer()">
-                  Save
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="addChofer()"
+                  :disabled="!valid"
+                >
+                  Guardar
                 </v-btn>
               </v-card-actions>
             </v-form>
@@ -74,46 +86,55 @@
         </v-dialog>
         <v-dialog v-model="dialogEdit" max-width="500px">
           <v-card>
-            <v-card-title>
-              <span class="text-h5">Editar Chofer</span>
-            </v-card-title>
+            <v-form ref="form" v-model="valid" lazy-validation>
+              <v-card-title>
+                <span class="text-h5">Editar Chofer</span>
+              </v-card-title>
 
-            <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col cols="12">
-                    <v-text-field
-                      id="chofer_nombre"
-                      v-model="currentChofer.nombre"
-                      label="Nombre del chofer*"
-                      required
-                    ></v-text-field>
-                    <v-text-field
-                      id="chofer_apellido"
-                      v-model="currentChofer.apellido"
-                      label="Apellido del chofer*"
-                      required
-                    ></v-text-field>
-                    <v-text-field
-                      id="chofer_dni"
-                      v-model="currentChofer.dni"
-                      label="DNI del chofer*"
-                      required
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
+              <v-card-text>
+                <v-container>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-text-field
+                        id="chofer_nombre"
+                        v-model="currentChofer.nombre"
+                        :counter="80"
+                        :rules="nombreRules"
+                        label="Nombre del chofer*"
+                        required
+                      ></v-text-field>
+                      <v-text-field
+                        id="chofer_apellido"
+                        v-model="currentChofer.apellido"
+                        :counter="80"
+                        :rules="apellidoRules"
+                        label="Apellido del chofer*"
+                        required
+                      ></v-text-field>
+                      <v-text-field
+                        id="chofer_dni"
+                        v-model="currentChofer.dni"
+                        type="number"
+                        :counter="10"
+                        :rules="dniRules"
+                        label="DNI del chofer*"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-card-text>
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeEdit">
-                Cancelar
-              </v-btn>
-              <v-btn color="blue darken-1" text @click="updateChofer()">
-                Guardar
-              </v-btn>
-            </v-card-actions>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="closeEdit">
+                  Cancelar
+                </v-btn>
+                <v-btn color="blue darken-1" text @click="updateChofer()">
+                  Guardar
+                </v-btn>
+              </v-card-actions>
+            </v-form>
           </v-card>
         </v-dialog>
       </v-toolbar>
@@ -153,9 +174,20 @@
       newChofer: { dni: null, nombre: null, apellido: null },
       valid: true,
       nombreRules: [
-        v => !!v || 'El nombre es requerido',
-        v => (v && v.length <= 80) || 'El nombre debe tener menos de 80 caracteres',
+        (v) => !!v || 'El nombre es requerido',
+        (v) =>
+          (v && v.length <= 80) || 'El nombre debe tener menos de 80 caracteres'
       ],
+      apellidoRules: [
+        (v) => !!v || 'El apellido es requerido',
+        (v) =>
+          (v && v.length <= 80) ||
+          'El apellido debe tener menos de 80 caracteres'
+      ],
+      dniRules: [
+        (v) => !!v || 'El dni es requerido',
+        (v) => (v && v.length <= 10) || 'El dni debe tener menos de 10 dígitos'
+      ]
     }),
 
     mounted() {
@@ -185,32 +217,34 @@
           })
       },
       addChofer: function () {
-        axios
-          .post(this.url + '/api/chofer/', this.newChofer)
-          .then(() => {
-            this.dialogAdd = false
-            this.getChoferes()
-            this.newChofer = {}
-          })
-          .catch((err) => {
-            console.log(err)
-          })
+        if (this.$refs.form.validate())
+          axios
+            .post(this.url + '/api/chofer/', this.newChofer)
+            .then(() => {
+              this.dialogAdd = false
+              this.getChoferes()
+              this.newChofer = {}
+            })
+            .catch((err) => {
+              console.log(err)
+            })
       },
       updateChofer: function () {
-        axios
-          .put(
-            this.url + `/api/chofer/${this.currentChofer.dni}/`,
-            this.currentChofer
-          )
-          .then((response) => {
-            console.log(this.url + `/api/chofer/${this.currentChofer.dni}/`)
-            this.currentChofer = response.data
-            this.dialogEdit = false
-            this.getChoferes()
-          })
-          .catch((err) => {
-            console.log(err)
-          })
+        if (this.$refs.form.validate())
+          axios
+            .put(
+              this.url + `/api/chofer/${this.currentChofer.dni}/`,
+              this.currentChofer
+            )
+            .then((response) => {
+              console.log(this.url + `/api/chofer/${this.currentChofer.dni}/`)
+              this.currentChofer = response.data
+              this.dialogEdit = false
+              this.getChoferes()
+            })
+            .catch((err) => {
+              console.log(err)
+            })
       },
       deleteChofer: function (id) {
         axios
@@ -223,11 +257,16 @@
             console.log(err)
           })
       },
+
       closeEdit() {
         this.dialogEdit = false
       },
       closeAdd() {
         this.dialogAdd = false
+      },
+
+      validate() {
+        this.$refs.form.validate()
       }
     }
   }

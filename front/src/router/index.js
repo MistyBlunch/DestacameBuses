@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Chofer from '../components/Chofer.vue'
 import About from '../components/About.vue'
-import Table from '../components/Table.vue'
+// import Table from '../components/Table.vue'
 
 Vue.use(VueRouter)
 
@@ -17,11 +17,11 @@ const routes = [
     name: 'chofer',
     component: Chofer
   },
-  {
-    path: '/bus',
-    name: 'Bus',
-    component: Table
-  },
+  // {
+  //   path: '/bus',
+  //   name: 'Bus',
+  //   component: Bus
+  // },
   // {
   //   path: '/about',
   //   name: 'About',
