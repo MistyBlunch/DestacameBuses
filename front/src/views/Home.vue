@@ -60,12 +60,12 @@
           path: '/bus'
         },
         {
-          name: 'pasajeros',
-          path: '/pasajeros'
+          name: 'pasajero',
+          path: '/pasajero'
         },
         {
-          name: 'trayectos',
-          path: '/trayectos'
+          name: 'trayecto',
+          path: '/trayecto'
         }
       ],
       drawer: false,

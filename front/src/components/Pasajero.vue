@@ -1,10 +1,10 @@
 <template>
   <v-data-table
     :headers="headers"
-    :items="choferes"
+    :items="pasajeros"
     :search="search"
     class="elevation-1"
-    :loading="!choferes.length"
+    :loading="!pasajeros.length"
     loading-text="Cargando... Por favor, espere"
     mobile-breakpoint="600"
   >
@@ -38,31 +38,30 @@
                   <v-row>
                     <v-col cols="12">
                       <v-text-field
-                        id="chofer_dni"
-                        v-model="newChofer.dni"
+                        id="pasajero_dni"
+                        v-model="newPasajero.dni"
                         type="number"
                         :counter="10"
                         :rules="dniRules"
-                        label="DNI del chofer*"
+                        label="DNI del pasajero*"
                         required
                       ></v-text-field>
                       <v-text-field
-                        id="chofer_nombre"
-                        v-model="newChofer.nombre"
+                        id="pasajero_nombre"
+                        v-model="newPasajero.nombre"
                         :counter="80"
                         :rules="nombreRules"
-                        label="Nombre del chofer*"
+                        label="Nombre del pasajero*"
                         required
                       ></v-text-field>
                       <v-text-field
-                        id="chofer_apellido"
-                        v-model="newChofer.apellido"
+                        id="pasajero_apellido"
+                        v-model="newPasajero.apellido"
                         :counter="80"
                         :rules="apellidoRules"
-                        label="Apellido del chofer*"
+                        label="Apellido del pasajero*"
                         required
                       ></v-text-field>
-                      
                     </v-col>
                   </v-row>
                 </v-container>
@@ -76,7 +75,7 @@
                 <v-btn
                   color="blue darken-1"
                   text
-                  @click="addChofer()"
+                  @click="addPasajero()"
                   :disabled="!valid"
                 >
                   Guardar
@@ -97,31 +96,30 @@
                   <v-row>
                     <v-col cols="12">
                       <v-text-field
-                        id="chofer_dni"
-                        v-model="currentChofer.dni"
+                        id="pasajero_dni"
+                        v-model="currentPasajero.dni"
                         type="number"
                         :counter="10"
                         :rules="dniRules"
-                        label="DNI del chofer*"
+                        label="DNI del pasajero*"
                         required
                       ></v-text-field>
                       <v-text-field
-                        id="chofer_nombre"
-                        v-model="currentChofer.nombre"
+                        id="pasajero_nombre"
+                        v-model="currentPasajero.nombre"
                         :counter="80"
                         :rules="nombreRules"
-                        label="Nombre del chofer*"
+                        label="Nombre del pasajero*"
                         required
                       ></v-text-field>
                       <v-text-field
-                        id="chofer_apellido"
-                        v-model="currentChofer.apellido"
+                        id="pasajero_apellido"
+                        v-model="currentPasajero.apellido"
                         :counter="80"
                         :rules="apellidoRules"
-                        label="Apellido del chofer*"
+                        label="Apellido del pasajero*"
                         required
                       ></v-text-field>
-                      
                     </v-col>
                   </v-row>
                 </v-container>
@@ -132,7 +130,7 @@
                 <v-btn color="blue darken-1" text @click="closeEdit">
                   Cancelar
                 </v-btn>
-                <v-btn color="blue darken-1" text @click="updateChofer()">
+                <v-btn color="blue darken-1" text @click="updatePasajero()">
                   Guardar
                 </v-btn>
               </v-card-actions>
@@ -142,13 +140,13 @@
       </v-toolbar>
     </template>
     <template v-slot:item.actions="{ item }">
-      <v-icon small class="mr-2" @click="getChofer(item.dni)">
+      <v-icon small class="mr-2" @click="getPasajero(item.dni)">
         mdi-pencil
       </v-icon>
-      <v-icon small @click="deleteChofer(item.dni)"> mdi-delete </v-icon>
+      <v-icon small @click="deletePasajero(item.dni)"> mdi-delete </v-icon>
     </template>
     <template v-slot:no-data>
-      <v-btn color="primary" @click="getChoferes"> Reset </v-btn>
+      <v-btn color="primary" @click="getPasajeros"> Reset </v-btn>
     </template>
   </v-data-table>
 </template>
@@ -157,8 +155,8 @@
   import axios from 'axios'
   export default {
     data: () => ({
-      title: 'Choferes',
-      text: 'Chofer',
+      title: 'Pasajeros',
+      text: 'Pasajero',
       search: '',
       dialogAdd: false,
       dialogEdit: false,
@@ -168,10 +166,10 @@
         { text: 'Apellido', value: 'apellido' },
         { text: 'Acciones', value: 'actions', sortable: false }
       ],
-      choferes: [],
+      pasajeros: [],
       url: 'http://127.0.0.1:8000',
-      currentChofer: {},
-      newChofer: { dni: null, nombre: null, apellido: null },
+      currentPasajero: {},
+      newPasajero: { dni: null, nombre: null, apellido: null },
       valid: true,
       nombreRules: [
         (v) => !!v || 'El nombre es requerido',
@@ -191,66 +189,68 @@
     }),
 
     mounted() {
-      this.getChoferes()
+      this.getPasajeros()
     },
 
     methods: {
-      getChoferes() {
+      getPasajeros() {
         axios
-          .get(this.url + '/api/chofer/')
+          .get(this.url + '/api/pasajero/')
           .then((response) => {
-            this.choferes = response.data
+            this.pasajeros = response.data
           })
           .catch((err) => {
             console.log(err)
           })
       },
-      getChofer(id) {
+      getPasajero(id) {
         this.dialogEdit = true
         axios
-          .get(this.url + `/api/chofer/${id}/`)
+          .get(this.url + `/api/pasajero/${id}/`)
           .then((response) => {
-            this.currentChofer = response.data
+            this.currentPasajero = response.data
           })
           .catch((err) => {
             console.log(err)
           })
       },
-      addChofer() {
+      addPasajero() {
         if (this.$refs.form.validate())
           axios
-            .post(this.url + '/api/chofer/', this.newChofer)
+            .post(this.url + '/api/pasajero/', this.newPasajero)
             .then(() => {
               this.dialogAdd = false
-              this.getChoferes()
-              this.newChofer = {}
+              this.getPasajeros()
+              this.newPasajero = {}
             })
             .catch((err) => {
               console.log(err)
             })
       },
-      updateChofer() {
+      updatePasajero() {
         if (this.$refs.form.validate())
           axios
             .put(
-              this.url + `/api/chofer/${this.currentChofer.dni}/`,
-              this.currentChofer
+              this.url + `/api/pasajero/${this.currentPasajero.dni}/`,
+              this.currentPasajero
             )
             .then((response) => {
-              console.log(this.url + `/api/chofer/${this.currentChofer.dni}/`)
-              this.currentChofer = response.data
+              console.log(
+                this.url + `/api/pasajero/${this.currentPasajero.dni}/`
+              )
+              this.currentPasajero = response.data
               this.dialogEdit = false
-              this.getChoferes()
+              this.getPasajeros()
             })
             .catch((err) => {
               console.log(err)
             })
       },
-      deleteChofer(id) {
+      deletePasajero(id) {
         axios
-          .delete(this.url + `/api/chofer/${id}/`)
+          .delete(this.url + `/api/pasajero/${id}/`)
           .then((response) => {
-            this.getChoferes()
+            this.getPasajeros()
             console.log(response)
           })
           .catch((err) => {
