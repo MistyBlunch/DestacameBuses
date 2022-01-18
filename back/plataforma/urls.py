@@ -1,7 +1,8 @@
 from django.urls import path
-
-from . import views
+from django.urls import path
+from . import queries
 
 urlpatterns = [
-  path('', views.index, name='index'),
+  path('choferbus/', queries.ChoferBusApiView.as_view()),
+  path('choferesavailables/', queries.ChoferesAvailablesApiView.as_view()),
 ]

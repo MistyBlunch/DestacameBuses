@@ -8,9 +8,12 @@ class ChoferSerializer(serializers.ModelSerializer):
 
 
 class BusSerializer(serializers.ModelSerializer):
+  chofer_id = serializers.IntegerField(write_only=True)
+
   class Meta:
     model = Bus
-    fields = '__all__'
+    fields = ("placa", "capacidad", "chofer", "chofer_id")
+    depth = 1
 
 
 class AsientoSerializer(serializers.ModelSerializer):

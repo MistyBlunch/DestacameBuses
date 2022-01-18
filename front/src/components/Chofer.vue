@@ -24,13 +24,13 @@
         <v-dialog v-model="dialogAdd" max-width="500px">
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="secondary" dark class="mb-2" v-bind="attrs" v-on="on">
-              Nuevo Chofer
+              Nuevo {{ text }}
             </v-btn>
           </template>
           <v-card>
             <v-form ref="form" v-model="valid" lazy-validation>
               <v-card-title>
-                <span class="text-h5">Añadir Chofer</span>
+                <span class="text-h5">Añadir {{ text }}</span>
               </v-card-title>
 
               <v-card-text>
@@ -88,7 +88,7 @@
           <v-card>
             <v-form ref="form" v-model="valid" lazy-validation>
               <v-card-title>
-                <span class="text-h5">Editar Chofer</span>
+                <span class="text-h5">Editar {{ text }}</span>
               </v-card-title>
 
               <v-card-text>
@@ -155,16 +155,14 @@
   import axios from 'axios'
   export default {
     data: () => ({
-      title: 'Buses',
+      title: 'Choferes',
+      text: 'Chofer',
       search: '',
       dialogAdd: false,
       dialogEdit: false,
       headers: [
         { text: 'DNI', value: 'dni' },
-        {
-          text: 'Nombres',
-          value: 'nombre'
-        },
+        { text: 'Nombres', value: 'nombre' },
         { text: 'Apellido', value: 'apellido' },
         { text: 'Acciones', value: 'actions', sortable: false }
       ],
@@ -195,7 +193,7 @@
     },
 
     methods: {
-      getChoferes: function () {
+      getChoferes() {
         axios
           .get(this.url + '/api/chofer/')
           .then((response) => {
@@ -205,7 +203,7 @@
             console.log(err)
           })
       },
-      getChofer: function (id) {
+      getChofer(id) {
         this.dialogEdit = true
         axios
           .get(this.url + `/api/chofer/${id}/`)
@@ -216,7 +214,7 @@
             console.log(err)
           })
       },
-      addChofer: function () {
+      addChofer() {
         if (this.$refs.form.validate())
           axios
             .post(this.url + '/api/chofer/', this.newChofer)
@@ -229,7 +227,7 @@
               console.log(err)
             })
       },
-      updateChofer: function () {
+      updateChofer() {
         if (this.$refs.form.validate())
           axios
             .put(
@@ -246,7 +244,7 @@
               console.log(err)
             })
       },
-      deleteChofer: function (id) {
+      deleteChofer(id) {
         axios
           .delete(this.url + `/api/chofer/${id}/`)
           .then((response) => {

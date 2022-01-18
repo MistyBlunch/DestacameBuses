@@ -1,10 +1,10 @@
 <template>
   <v-data-table
     :headers="headers"
-    :items="choferes"
+    :items="buses"
     :search="search"
     class="elevation-1"
-    :loading="!choferes.length"
+    :loading="!buses.length"
     loading-text="Cargando... Por favor, espere"
     mobile-breakpoint="600"
   >
@@ -24,13 +24,13 @@
         <v-dialog v-model="dialogAdd" max-width="500px">
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="secondary" dark class="mb-2" v-bind="attrs" v-on="on">
-              Nuevo Chofer
+              Nuevo {{ text }}
             </v-btn>
           </template>
           <v-card>
             <v-form ref="form" v-model="valid" lazy-validation>
               <v-card-title>
-                <span class="text-h5">Añadir Chofer</span>
+                <span class="text-h5">Añadir {{ text }}</span>
               </v-card-title>
 
               <v-card-text>
@@ -38,29 +38,28 @@
                   <v-row>
                     <v-col cols="12">
                       <v-text-field
-                        id="chofer_nombre"
-                        v-model="newChofer.nombre"
-                        :counter="80"
-                        :rules="nombreRules"
-                        label="Nombre del chofer*"
-                        required
-                      ></v-text-field>
-                      <v-text-field
-                        id="chofer_apellido"
-                        v-model="newChofer.apellido"
-                        :counter="80"
-                        :rules="apellidoRules"
-                        label="Apellido del chofer*"
-                        required
-                      ></v-text-field>
-                      <v-text-field
-                        id="chofer_dni"
-                        v-model="newChofer.dni"
-                        type="number"
+                        id="bus_placa"
+                        v-model="newBus.placa"
                         :counter="10"
-                        :rules="dniRules"
-                        label="DNI del chofer*"
+                        :rules="placaRules"
+                        label="Placa del bus*"
+                        type="number"
                         required
+                      ></v-text-field>
+                      <v-select
+                        id="chofer_id"
+                        v-model="newBus.chofer_id"
+                        label="id del chofer*"
+                        :items="choferesAddOpts"
+                        :rules="selectRules"
+                        required
+                      ></v-select>
+                      <v-text-field
+                        id="bus_capacidad"
+                        v-model="newBus.capacidad"
+                        value="10"
+                        type="number"
+                        disabled
                       ></v-text-field>
                     </v-col>
                   </v-row>
@@ -75,7 +74,7 @@
                 <v-btn
                   color="blue darken-1"
                   text
-                  @click="addChofer()"
+                  @click="addBus()"
                   :disabled="!valid"
                 >
                   Guardar
@@ -88,7 +87,7 @@
           <v-card>
             <v-form ref="form" v-model="valid" lazy-validation>
               <v-card-title>
-                <span class="text-h5">Editar Chofer</span>
+                <span class="text-h5">Editar {{ text }}</span>
               </v-card-title>
 
               <v-card-text>
@@ -96,28 +95,27 @@
                   <v-row>
                     <v-col cols="12">
                       <v-text-field
-                        id="chofer_nombre"
-                        v-model="currentChofer.nombre"
-                        :counter="80"
-                        :rules="nombreRules"
-                        label="Nombre del chofer*"
-                        required
-                      ></v-text-field>
-                      <v-text-field
-                        id="chofer_apellido"
-                        v-model="currentChofer.apellido"
-                        :counter="80"
-                        :rules="apellidoRules"
-                        label="Apellido del chofer*"
-                        required
-                      ></v-text-field>
-                      <v-text-field
-                        id="chofer_dni"
-                        v-model="currentChofer.dni"
-                        type="number"
+                        id="bus_placa"
+                        v-model="currentBus.placa"
                         :counter="10"
-                        :rules="dniRules"
-                        label="DNI del chofer*"
+                        :rules="placaRules"
+                        label="Placa del bus*"
+                        required
+                      ></v-text-field>
+                      <v-select
+                        id="chofer_id"
+                        v-model="currentBus.chofer_id"
+                        :items="choferesAddOpts"
+                        :rules="selectRules"
+                        label="id del chofer*"
+                        required
+                      ></v-select>
+                      <v-text-field
+                        id="bus_capacidad"
+                        v-model="currentBus.capacidad"
+                        value="10"
+                        type="number"
+                        disabled
                         required
                       ></v-text-field>
                     </v-col>
@@ -130,7 +128,7 @@
                 <v-btn color="blue darken-1" text @click="closeEdit">
                   Cancelar
                 </v-btn>
-                <v-btn color="blue darken-1" text @click="updateChofer()">
+                <v-btn color="blue darken-1" text @click="updateBus()">
                   Guardar
                 </v-btn>
               </v-card-actions>
@@ -140,13 +138,13 @@
       </v-toolbar>
     </template>
     <template v-slot:item.actions="{ item }">
-      <v-icon small class="mr-2" @click="getChofer(item.dni)">
+      <v-icon small class="mr-2" @click="getBus(item.placa)">
         mdi-pencil
       </v-icon>
-      <v-icon small @click="deleteChofer(item.dni)"> mdi-delete </v-icon>
+      <v-icon small @click="deleteBus(item.placa)"> mdi-delete </v-icon>
     </template>
     <template v-slot:no-data>
-      <v-btn color="primary" @click="getChoferes"> Reset </v-btn>
+      <v-btn color="primary" @click="getBuses"> Reset </v-btn>
     </template>
   </v-data-table>
 </template>
@@ -156,101 +154,126 @@
   export default {
     data: () => ({
       title: 'Buses',
+      text: 'Bus',
       search: '',
       dialogAdd: false,
       dialogEdit: false,
       headers: [
-        { text: 'DNI', value: 'dni' },
-        {
-          text: 'Nombres',
-          value: 'nombre'
-        },
-        { text: 'Apellido', value: 'apellido' },
+        { text: 'Chofer', value: 'chofer.dni_nombre' },
+        { text: 'Capacidad', value: 'capacidad' },
         { text: 'Acciones', value: 'actions', sortable: false }
       ],
-      choferes: [],
+      buses: [],
+      choferesBuses: [],
+      choferesAva: [],
+      choferesAddOpts: [],
       url: 'http://127.0.0.1:8000',
-      currentChofer: {},
-      newChofer: { dni: null, nombre: null, apellido: null },
+      currentBus: {},
+      newBus: { placa: null, chofer_id: null, capacidad: 10 },
       valid: true,
-      nombreRules: [
-        (v) => !!v || 'El nombre es requerido',
+      selectRules: [(v) => !!v || 'Es necesario seleccionar un chofer'],
+      placaRules: [
+        (v) => !!v || 'La placa es requerida',
         (v) =>
-          (v && v.length <= 80) || 'El nombre debe tener menos de 80 caracteres'
-      ],
-      apellidoRules: [
-        (v) => !!v || 'El apellido es requerido',
-        (v) =>
-          (v && v.length <= 80) ||
-          'El apellido debe tener menos de 80 caracteres'
-      ],
-      dniRules: [
-        (v) => !!v || 'El dni es requerido',
-        (v) => (v && v.length <= 10) || 'El dni debe tener menos de 10 dígitos'
+          (v && v.length <= 80) || 'La placa debe tener menos de 10 caracteres'
       ]
     }),
 
     mounted() {
-      this.getChoferes()
+      this.getBuses()
     },
 
     methods: {
-      getChoferes: function () {
+      getBuses() {
         axios
-          .get(this.url + '/api/chofer/')
+          .get(this.url + '/api/choferbus/')
           .then((response) => {
-            this.choferes = response.data
+            this.buses = response.data
+            this.buses.map((bus) => {
+              this.choferesBuses.push(bus.chofer.dni_nombre)
+            })
+            this.getChoferesAvailables()
           })
           .catch((err) => {
             console.log(err)
           })
       },
-      getChofer: function (id) {
+      getChoferesAvailables() {
+        axios
+          .get(this.url + '/api/choferesavailables/')
+          .then((response) => {
+            this.choferesAva = response.data.results
+            this.choferesAva.map((chofer) => {
+              this.choferesAddOpts.push(
+                chofer.pk +
+                  ' - ' +
+                  chofer.fields.nombre +
+                  ' ' +
+                  chofer.fields.apellido
+              )
+            })
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      },
+      getBus(id) {
         this.dialogEdit = true
         axios
-          .get(this.url + `/api/chofer/${id}/`)
+          .get(this.url + `/api/bus/${id}/`)
           .then((response) => {
-            this.currentChofer = response.data
+            this.currentBus = response.data
+            console.log(this.currentBus)
           })
           .catch((err) => {
             console.log(err)
           })
       },
-      addChofer: function () {
-        if (this.$refs.form.validate())
+      addBus() {
+        console.log(this.newBus)
+        if (this.$refs.form.validate()) {
+          this.newBus.chofer_id = this.newBus.chofer_id.split(' ')[0]
           axios
-            .post(this.url + '/api/chofer/', this.newChofer)
+            .post(this.url + '/api/bus/', this.newBus)
             .then(() => {
               this.dialogAdd = false
-              this.getChoferes()
-              this.newChofer = {}
+              this.getBuses()
+              this.newBus = {}
+              this.choferesAddOpts = []
             })
             .catch((err) => {
               console.log(err)
             })
+        }
       },
-      updateChofer: function () {
-        if (this.$refs.form.validate())
+      updateBus() {
+        if (this.$refs.form.validate()) {
+          this.currentBus.chofer_id = this.currentBus.chofer_id.split(' ')[0]
+          console.log(this.currentBus)
+          console.log(this.newBus)
+          delete this.currentBus.chofer
           axios
             .put(
-              this.url + `/api/chofer/${this.currentChofer.dni}/`,
-              this.currentChofer
+              this.url + `/api/bus/${this.currentBus.placa}/`,
+              this.currentBus
             )
             .then((response) => {
-              console.log(this.url + `/api/chofer/${this.currentChofer.dni}/`)
-              this.currentChofer = response.data
+              this.currentBus = response.data
               this.dialogEdit = false
-              this.getChoferes()
+              this.getBuses()
+              this.choferesAddOpts = []
             })
             .catch((err) => {
               console.log(err)
             })
+        }
       },
-      deleteChofer: function (id) {
+      deleteBus(id) {
+        console.log(id)
         axios
-          .delete(this.url + `/api/chofer/${id}/`)
+          .delete(this.url + `/api/bus/${id}/`)
           .then((response) => {
-            this.getChoferes()
+            this.getBuses()
             console.log(response)
           })
           .catch((err) => {
