@@ -29,9 +29,13 @@ class PasajeroSerializer(serializers.ModelSerializer):
 
 
 class TrayectoSerializer(serializers.ModelSerializer):
+  bus_id = serializers.IntegerField(write_only=True)
+  horario = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", input_formats=["%Y-%m-%d %H:%M:%S"])
+
   class Meta:
     model = Trayecto
-    fields = '__all__'
+    fields = ("id", "horario", "lugar_partida", "lugar_llegada", "bus", "bus_id")
+    depth = 2
 
 
 class ViajeSerializer(serializers.ModelSerializer):

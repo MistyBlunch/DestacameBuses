@@ -4,6 +4,7 @@ import Chofer from '../components/Chofer.vue'
 import About from '../components/About.vue'
 import Bus from '../components/Bus.vue'
 import Pasajero from '../components/Pasajero.vue'
+import Trayecto from '../components/Trayecto.vue'
 
 Vue.use(VueRouter)
 
@@ -28,6 +29,11 @@ const routes = [
     name: 'Pasajero',
     component: Pasajero
   },
+  {
+    path: '/trayecto',
+    name: 'Trayecto',
+    component: Trayecto
+  }
 ]
 
 const router = new VueRouter({

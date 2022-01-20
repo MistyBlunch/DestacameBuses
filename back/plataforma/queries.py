@@ -29,3 +29,19 @@ class ChoferesAvailablesApiView(APIView):
 
     json_serialized = serializers.serialize("json", choferes)
     return Response({'results': json.loads(json_serialized)})
+
+
+class TrayectosBusesApiView(APIView):
+  def get(self, request, format=None):
+    exclude_choferes = []
+
+    buses = Bus.objects.all()
+    bus_serializer = BusSerializer(buses, many=True)
+
+    for i in bus_serializer.data:
+      exclude_choferes.append(i['chofer']['dni'])
+
+    choferes = Chofer.objects.exclude(dni__in=exclude_choferes)
+
+    json_serialized = serializers.serialize("json", choferes)
+    return Response({'results': json.loads(json_serialized)})

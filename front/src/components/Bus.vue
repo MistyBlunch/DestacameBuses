@@ -105,9 +105,9 @@
                       <v-select
                         id="chofer_id"
                         v-model="currentBus.chofer_id"
+                        label="id del chofer*"
                         :items="choferesAddOpts"
                         :rules="selectRules"
-                        label="id del chofer*"
                         required
                       ></v-select>
                       <v-text-field
@@ -164,7 +164,6 @@
         { text: 'Acciones', value: 'actions', sortable: false }
       ],
       buses: [],
-      choferesBuses: [],
       choferesAva: [],
       choferesAddOpts: [],
       url: 'http://127.0.0.1:8000',
@@ -189,9 +188,6 @@
           .get(this.url + '/api/choferbus/')
           .then((response) => {
             this.buses = response.data
-            this.buses.map((bus) => {
-              this.choferesBuses.push(bus.chofer.dni_nombre)
-            })
             this.getChoferesAvailables()
           })
           .catch((err) => {
@@ -223,14 +219,12 @@
           .get(this.url + `/api/bus/${id}/`)
           .then((response) => {
             this.currentBus = response.data
-            console.log(this.currentBus)
           })
           .catch((err) => {
             console.log(err)
           })
       },
       addBus() {
-        console.log(this.newBus)
         if (this.$refs.form.validate()) {
           this.newBus.chofer_id = this.newBus.chofer_id.split(' ')[0]
           axios
@@ -249,8 +243,6 @@
       updateBus() {
         if (this.$refs.form.validate()) {
           this.currentBus.chofer_id = this.currentBus.chofer_id.split(' ')[0]
-          console.log(this.currentBus)
-          console.log(this.newBus)
           delete this.currentBus.chofer
           axios
             .put(
@@ -269,7 +261,6 @@
         }
       },
       deleteBus(id) {
-        console.log(id)
         axios
           .delete(this.url + `/api/bus/${id}/`)
           .then((response) => {
