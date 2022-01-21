@@ -4,7 +4,7 @@
     :items="pasajeros"
     :search="search"
     class="elevation-1"
-    :loading="!pasajeros.length"
+    :loading="loadTable"
     loading-text="Cargando... Por favor, espere"
     mobile-breakpoint="600"
   >
@@ -140,13 +140,15 @@
       </v-toolbar>
     </template>
     <template v-slot:item.actions="{ item }">
-      <v-icon small class="mr-2" @click="getPasajero(item.dni)">
+      <v-icon small class="mr-2" @click="getPasajero(item.id)">
         mdi-pencil
       </v-icon>
-      <v-icon small @click="deletePasajero(item.dni)"> mdi-delete </v-icon>
+      <v-icon small @click="deletePasajero(item.id)"> mdi-delete </v-icon>
     </template>
     <template v-slot:no-data>
-      <v-btn color="primary" @click="getPasajeros"> Reset </v-btn>
+      <v-alert outlined color="black" class="mt-4">
+        <div>No hay {{ title }}</div>
+      </v-alert>
     </template>
   </v-data-table>
 </template>
@@ -171,6 +173,7 @@
       currentPasajero: {},
       newPasajero: { dni: null, nombre: null, apellido: null },
       valid: true,
+      loadTable: true,
       nombreRules: [
         (v) => !!v || 'El nombre es requerido',
         (v) =>
@@ -198,6 +201,8 @@
           .get(this.url + '/api/pasajero/')
           .then((response) => {
             this.pasajeros = response.data
+            if (!this.pasajeros) console.log('No hay pasajeros')
+            else this.loadTable = false
           })
           .catch((err) => {
             console.log(err)
@@ -231,13 +236,10 @@
         if (this.$refs.form.validate())
           axios
             .put(
-              this.url + `/api/pasajero/${this.currentPasajero.dni}/`,
+              this.url + `/api/pasajero/${this.currentPasajero.id}/`,
               this.currentPasajero
             )
             .then((response) => {
-              console.log(
-                this.url + `/api/pasajero/${this.currentPasajero.dni}/`
-              )
               this.currentPasajero = response.data
               this.dialogEdit = false
               this.getPasajeros()

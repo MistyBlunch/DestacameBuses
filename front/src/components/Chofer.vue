@@ -4,7 +4,7 @@
     :items="choferes"
     :search="search"
     class="elevation-1"
-    :loading="!choferes.length"
+    :loading="loadTable"
     loading-text="Cargando... Por favor, espere"
     mobile-breakpoint="600"
   >
@@ -62,7 +62,6 @@
                         label="Apellido del chofer*"
                         required
                       ></v-text-field>
-                      
                     </v-col>
                   </v-row>
                 </v-container>
@@ -121,7 +120,6 @@
                         label="Apellido del chofer*"
                         required
                       ></v-text-field>
-                      
                     </v-col>
                   </v-row>
                 </v-container>
@@ -142,13 +140,15 @@
       </v-toolbar>
     </template>
     <template v-slot:item.actions="{ item }">
-      <v-icon small class="mr-2" @click="getChofer(item.dni)">
+      <v-icon small class="mr-2" @click="getChofer(item.id)">
         mdi-pencil
       </v-icon>
-      <v-icon small @click="deleteChofer(item.dni)"> mdi-delete </v-icon>
+      <v-icon small @click="deleteChofer(item.id)"> mdi-delete </v-icon>
     </template>
     <template v-slot:no-data>
-      <v-btn color="primary" @click="getChoferes"> Reset </v-btn>
+      <v-alert outlined color="black" class="mt-4">
+        <div>No hay {{ title }}</div>
+      </v-alert>
     </template>
   </v-data-table>
 </template>
@@ -173,6 +173,7 @@
       currentChofer: {},
       newChofer: { dni: null, nombre: null, apellido: null },
       valid: true,
+      loadTable: true,
       nombreRules: [
         (v) => !!v || 'El nombre es requerido',
         (v) =>
@@ -200,6 +201,8 @@
           .get(this.url + '/api/chofer/')
           .then((response) => {
             this.choferes = response.data
+            if (!this.choferes) console.log('No hay choferes')
+            else this.loadTable = false
           })
           .catch((err) => {
             console.log(err)
@@ -233,11 +236,10 @@
         if (this.$refs.form.validate())
           axios
             .put(
-              this.url + `/api/chofer/${this.currentChofer.dni}/`,
+              this.url + `/api/chofer/${this.currentChofer.id}/`,
               this.currentChofer
             )
             .then((response) => {
-              console.log(this.url + `/api/chofer/${this.currentChofer.dni}/`)
               this.currentChofer = response.data
               this.dialogEdit = false
               this.getChoferes()

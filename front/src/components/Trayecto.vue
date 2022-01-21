@@ -4,7 +4,7 @@
     :items="trayectos"
     :search="search"
     class="elevation-1"
-    :loading="!trayectos.length"
+    :loading="loadTable"
     loading-text="Cargando... Por favor, espere"
     mobile-breakpoint="600"
   >
@@ -260,7 +260,9 @@
       <v-icon small @click="deleteTrayecto(item.id)"> mdi-delete </v-icon>
     </template>
     <template v-slot:no-data>
-      <v-btn color="primary" @click="getTrayectos"> Reset </v-btn>
+      <v-alert outlined color="black" class="mt-4">
+        <div>No hay {{ title }}</div>
+      </v-alert>
     </template>
   </v-data-table>
 </template>
@@ -295,6 +297,7 @@
         lugar_partida: null
       },
       valid: true,
+      loadTable: true,
       date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
         .toISOString()
         .substr(0, 10),
@@ -328,6 +331,8 @@
           .get(this.url + '/api/trayecto/')
           .then((response) => {
             this.trayectos = response.data
+            if (!this.trayectos) console.log('No hay buses')
+            else this.loadTable = false
             this.trayectos.map((trayecto) => {
               this.placaBus.push(trayecto.bus.placa)
             })

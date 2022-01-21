@@ -12,7 +12,7 @@ class BusSerializer(serializers.ModelSerializer):
 
   class Meta:
     model = Bus
-    fields = ("placa", "capacidad", "chofer", "chofer_id")
+    fields = ("id", "placa", "capacidad", "chofer", "chofer_id")
     depth = 1
 
 

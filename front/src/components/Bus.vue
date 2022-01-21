@@ -4,7 +4,7 @@
     :items="buses"
     :search="search"
     class="elevation-1"
-    :loading="!buses.length"
+    :loading="loadTable"
     loading-text="Cargando... Por favor, espere"
     mobile-breakpoint="600"
   >
@@ -138,13 +138,13 @@
       </v-toolbar>
     </template>
     <template v-slot:item.actions="{ item }">
-      <v-icon small class="mr-2" @click="getBus(item.placa)">
-        mdi-pencil
-      </v-icon>
-      <v-icon small @click="deleteBus(item.placa)"> mdi-delete </v-icon>
+      <v-icon small class="mr-2" @click="getBus(item.id)"> mdi-pencil </v-icon>
+      <v-icon small @click="deleteBus(item.id)"> mdi-delete </v-icon>
     </template>
     <template v-slot:no-data>
-      <v-btn color="primary" @click="getBuses"> Reset </v-btn>
+      <v-alert outlined color="black" class="mt-4">
+        <div>No hay {{ title }}</div>
+      </v-alert>
     </template>
   </v-data-table>
 </template>
@@ -159,6 +159,7 @@
       dialogAdd: false,
       dialogEdit: false,
       headers: [
+        { text: 'Placa', value: 'placa' },
         { text: 'Chofer', value: 'chofer.dni_nombre' },
         { text: 'Capacidad', value: 'capacidad' },
         { text: 'Acciones', value: 'actions', sortable: false }
@@ -170,6 +171,7 @@
       currentBus: {},
       newBus: { placa: null, chofer_id: null, capacidad: 10 },
       valid: true,
+      loadTable: true,
       selectRules: [(v) => !!v || 'Es necesario seleccionar un chofer'],
       placaRules: [
         (v) => !!v || 'La placa es requerida',
@@ -188,6 +190,8 @@
           .get(this.url + '/api/choferbus/')
           .then((response) => {
             this.buses = response.data
+            if (!this.buses) console.log('No hay buses')
+            else this.loadTable = false
             this.getChoferesAvailables()
           })
           .catch((err) => {
@@ -219,12 +223,21 @@
           .get(this.url + `/api/bus/${id}/`)
           .then((response) => {
             this.currentBus = response.data
+            // Para que aparezca el chofer actual
+            this.currentBus.chofer_id =
+              this.currentBus.chofer.dni +
+              ' - ' +
+              this.currentBus.chofer.nombre +
+              ' ' +
+              this.currentBus.chofer.apellido
+            this.choferesAddOpts.push(this.currentBus.chofer_id)
           })
           .catch((err) => {
             console.log(err)
           })
       },
       addBus() {
+        console.log(this.newBus)
         if (this.$refs.form.validate()) {
           this.newBus.chofer_id = this.newBus.chofer_id.split(' ')[0]
           axios
@@ -233,6 +246,7 @@
               this.dialogAdd = false
               this.getBuses()
               this.newBus = {}
+              this.newBus.capacidad = 10
               this.choferesAddOpts = []
             })
             .catch((err) => {
@@ -242,13 +256,10 @@
       },
       updateBus() {
         if (this.$refs.form.validate()) {
-          this.currentBus.chofer_id = this.currentBus.chofer_id.split(' ')[0]
+          this.currentBus.chofer_id = this.currentBus.chofer.id
           delete this.currentBus.chofer
           axios
-            .put(
-              this.url + `/api/bus/${this.currentBus.placa}/`,
-              this.currentBus
-            )
+            .put(this.url + `/api/bus/${this.currentBus.id}/`, this.currentBus)
             .then((response) => {
               this.currentBus = response.data
               this.dialogEdit = false
