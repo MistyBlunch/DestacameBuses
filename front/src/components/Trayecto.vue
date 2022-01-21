@@ -40,7 +40,7 @@
                       <v-select
                         id="bus_id"
                         v-model="newTrayecto.bus_id"
-                        label="id del bus*"
+                        label="placa del bus*"
                         :items="placaBus"
                         :rules="selectRules"
                         required
@@ -154,7 +154,7 @@
                       <v-select
                         id="bus_id"
                         v-model="currentTrayecto.bus_id"
-                        label="id del bus*"
+                        label="placa del bus*"
                         :items="placaBus"
                         :rules="selectRules"
                         required
@@ -285,6 +285,7 @@
         { text: 'Acciones', value: 'actions', sortable: false }
       ],
       trayectos: [],
+      buses: [],
       placaBus: [],
       url: 'http://127.0.0.1:8000',
       currentTrayecto: {},
@@ -296,6 +297,7 @@
         lugar_llegada: null,
         lugar_partida: null
       },
+      bus_id: '',
       valid: true,
       loadTable: true,
       date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
@@ -326,16 +328,29 @@
     },
 
     methods: {
+      getBuses() {
+        axios
+          .get(this.url + '/api/choferbus/')
+          .then((response) => {
+            this.buses = response.data
+            if (!this.buses) console.log('No hay buses')
+            else this.loadTable = false
+            this.buses.map((bus) => {
+              this.placaBus.push(bus.placa)
+            })
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      },
       getTrayectos() {
         axios
           .get(this.url + '/api/trayecto/')
           .then((response) => {
             this.trayectos = response.data
-            if (!this.trayectos) console.log('No hay buses')
+            if (!this.trayectos) console.log('No hay trayectos')
             else this.loadTable = false
-            this.trayectos.map((trayecto) => {
-              this.placaBus.push(trayecto.bus.placa)
-            })
+            this.getBuses()
           })
           .catch((err) => {
             console.log(err)
@@ -358,10 +373,16 @@
       },
       addTrayecto() {
         if (this.$refs.form.validate()) {
+          this.bus_id = this.buses.filter(
+            (bus) => bus.placa == this.newTrayecto.bus_id
+          )
+
+          this.newTrayecto.bus_id = this.bus_id[0].id
           this.newTrayecto.horario =
             this.newTrayecto.date + ' ' + this.newTrayecto.time + ':00'
           delete this.newTrayecto.date
           delete this.newTrayecto.time
+
           axios
             .post(this.url + '/api/trayecto/', this.newTrayecto)
             .then(() => {
@@ -376,6 +397,11 @@
       },
       updateTrayecto() {
         if (this.$refs.form.validate()) {
+          this.bus_id = this.buses.filter(
+            (bus) => bus.placa == this.currentTrayecto.bus_id
+          )
+
+          this.currentTrayecto.bus_id = this.bus_id[0].id
           axios
             .put(
               this.url + `/api/trayecto/${this.currentTrayecto.id}/`,
