@@ -70,6 +70,10 @@
         {
           name: 'viajes',
           path: '/viajes'
+        },
+        {
+          name: 'metricas',
+          path: '/metricas'
         }
       ],
       drawer: false,
