@@ -95,3 +95,14 @@ class AsientosAvailablesApiView(APIView):
     serializer = AsientoSerializer(queryset, many=True)
 
     return Response(serializer.data, status=200)
+
+
+class TrayectosPromediosPasajerosApiView(APIView):
+  def get(request, self, format=None):
+    data = []
+    # queryset = Trayecto.objects.filter(lugar_partida__iexact=partida, lugar_llegada__iexact=llegada)
+    queryset = Trayecto.objects.all()
+    serializer = TrayectoSerializer(queryset, many=True)
+
+    data_json = json.dumps(data)
+    return Response(serializer.data, status=200)

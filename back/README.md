@@ -26,9 +26,22 @@ Instala las dependencias
 ```bash
 pip3 install -r requirements.txt
 ```
+Crea una base datos en PostgreSQL
+```bash
+CREATE DATABASE agencia_buses;
+```
+En el archivo settings.py cambia las credenciales de password y user en la configuración de databases
+```bash
+'USER': '<user>',
+'PASSWORD': '<password>',
+```
+Ejecuta las migraciones
+```bash
+python3 manage.py migrate
+```
 Corre el proyecto
 ```bash
-
+python3 manage.py runserver
 ```
 
-
+Made with :heart:

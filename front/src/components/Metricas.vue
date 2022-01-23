@@ -14,7 +14,7 @@
 
     data: () => ({
       title1: 'Trayectos - Promedio de pasajeros',
-      title2: 'Buses de un trayecto - Porcentaje de capacidad vendida',
+      title2: 'Buses de un trayecto - Porcentaje de capacidad v endida',
     })
   }
 </script>

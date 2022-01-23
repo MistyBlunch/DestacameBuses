@@ -1,24 +1,22 @@
-# front
+# Destacame Buses - Frontend
+Plataforma para registrar trayectos, choferes, buses, pasajeros y viajes con la opción de reserva de asientos.
 
-## Project setup
+### Guía de instalación
+Descarga el repositorio
+```bash
+git clone https://github.com/MistyBlunch/DestacameBuses.git
 ```
+Ingresa al repositorio (back)
+```bash
+cd DestacameBuses/front/
+```
+Instala las dependencias
+```bash
 npm install
 ```
-
-### Compiles and hot-reloads for development
-```
+Corre el proyecto
+```bash
 npm run serve
 ```
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Made with :heart:
