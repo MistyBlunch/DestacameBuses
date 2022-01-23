@@ -5,6 +5,7 @@ import About from '../components/About.vue'
 import Bus from '../components/Bus.vue'
 import Pasajero from '../components/Pasajero.vue'
 import Trayecto from '../components/Trayecto.vue'
+import Viajes from '../components/Viajes.vue'
 
 Vue.use(VueRouter)
 
@@ -15,24 +16,29 @@ const routes = [
     component: About
   },
   {
-    path: '/chofer',
-    name: 'chofer',
+    path: '/choferes',
+    name: 'choferes',
     component: Chofer
   },
   {
-    path: '/bus',
-    name: 'Bus',
+    path: '/buses',
+    name: 'Buses',
     component: Bus
   },
   {
-    path: '/pasajero',
-    name: 'Pasajero',
+    path: '/pasajeros',
+    name: 'Pasajeros',
     component: Pasajero
   },
   {
-    path: '/trayecto',
-    name: 'Trayecto',
+    path: '/trayectos',
+    name: 'Trayectos',
     component: Trayecto
+  },
+  {
+    path: '/viajes',
+    name: 'Viajes',
+    component: Viajes
   }
 ]
 

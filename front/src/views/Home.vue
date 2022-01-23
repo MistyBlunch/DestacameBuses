@@ -52,20 +52,24 @@
           path: '/'
         },
         {
-          name: 'chofer',
-          path: '/chofer'
+          name: 'choferes',
+          path: '/choferes'
         },
         {
-          name: 'bus',
-          path: '/bus'
+          name: 'buses',
+          path: '/buses'
         },
         {
-          name: 'pasajero',
-          path: '/pasajero'
+          name: 'pasajeros',
+          path: '/pasajeros'
         },
         {
-          name: 'trayecto',
-          path: '/trayecto'
+          name: 'trayectos',
+          path: '/trayectos'
+        },
+        {
+          name: 'viajes',
+          path: '/viajes'
         }
       ],
       drawer: false,

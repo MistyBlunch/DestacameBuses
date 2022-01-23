@@ -29,7 +29,7 @@ class BusViewSet(viewsets.ModelViewSet):
     for i in range(int(request.data['capacidad'])):
       Asiento.objects.create(
         bus= Bus.objects.get(placa=request.data['placa']), 
-        numero=i, 
+        numero=i+1, 
         ocupado=False
       )
 

@@ -80,6 +80,8 @@
                             readonly
                             v-bind="attrs"
                             v-on="on"
+                            :rules="timeRules"
+                            required
                           ></v-text-field>
                         </template>
                         <v-date-picker
@@ -278,7 +280,7 @@
       dialogEdit: false,
       headers: [
         { text: 'Bus', value: 'bus.placa' },
-        { text: 'Chofer', value: 'bus.chofer.nombre' },
+        { text: 'Chofer', value: 'bus.chofer.dni_nombre' },
         { text: 'Horario', value: 'horario' },
         { text: 'Lugar de partida', value: 'lugar_partida' },
         { text: 'Lugar de llegada', value: 'lugar_llegada' },
@@ -328,29 +330,28 @@
     },
 
     methods: {
-      getBuses() {
-        axios
-          .get(this.url + '/api/choferbus/')
-          .then((response) => {
-            this.buses = response.data
-            if (!this.buses) console.log('No hay buses')
-            else this.loadTable = false
-            this.buses.map((bus) => {
-              this.placaBus.push(bus.placa)
-            })
-          })
-          .catch((err) => {
-            console.log(err)
-          })
-      },
       getTrayectos() {
         axios
-          .get(this.url + '/api/trayecto/')
+          .get(this.url + '/api/trayectos-details/')
           .then((response) => {
             this.trayectos = response.data
             if (!this.trayectos) console.log('No hay trayectos')
             else this.loadTable = false
             this.getBuses()
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      },
+      getBuses() {
+        axios
+          .get(this.url + '/api/chofer-bus/')
+          .then((response) => {
+            this.buses = response.data
+
+            this.buses.map((bus) => {
+              this.placaBus.push(bus.placa)
+            })
           })
           .catch((err) => {
             console.log(err)

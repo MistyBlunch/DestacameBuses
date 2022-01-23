@@ -187,7 +187,7 @@
     methods: {
       getBuses() {
         axios
-          .get(this.url + '/api/choferbus/')
+          .get(this.url + '/api/chofer-bus/')
           .then((response) => {
             this.buses = response.data
             if (!this.buses) console.log('No hay buses')
@@ -200,7 +200,7 @@
       },
       getChoferesAvailables() {
         axios
-          .get(this.url + '/api/choferesavailables/')
+          .get(this.url + '/api/choferes-availables/')
           .then((response) => {
             this.choferesAva = response.data.results
             this.choferesAva.map((chofer) => {
