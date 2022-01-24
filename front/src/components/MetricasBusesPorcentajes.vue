@@ -1,24 +1,62 @@
 <template>
   <div class="container">
     <h5 class="title text-left">{{ title }}</h5>
-    <v-select
-      id="chofer_id"
-      v-model="newBus.chofer_id"
-      label="Selecciona al chofer*"
-      :items="choferesAddOpts"
-      :rules="selectRules"
-      required
-    ></v-select>
-    <v-select>
-      <template slot="selection" slot-scope="trayectos">
-        <!-- HTML that describe how select should render selected items -->
-        {{ trayectos.lugar_partida }} - {{ trayectos.lugar_llegada }}
-      </template>
-      <template slot="item" slot-scope="trayectos">
-        <!-- HTML that describe how select should render items when the select is open -->
-        {{ trayectos.item.lugar_partida }} - {{ trayectos.item.lugar_llegada }}
-      </template>
-    </v-select>
+    <template>
+      <v-form ref="form" v-model="valid" lazy-validation>
+        <v-select
+          v-model="trayectoSelected"
+          label="Selecciona un trayecto*"
+          :items="trayectos"
+          :item-text="(item) => `${item.lugar_partida} - ${item.lugar_llegada}`"
+          :rules="trayectosRules"
+          required
+        ></v-select>
+        <v-text-field
+          v-model="porcentajeCapacidad"
+          type="number"
+          label="Porcentaje de capacidad*"
+          required
+          :rules="porcentajeRules"
+        ></v-text-field>
+
+        <v-btn class="mr-4" @click="submit" :disabled="!valid"> Enviar </v-btn>
+        <v-btn @click="clear"> clear </v-btn>
+      </v-form>
+    </template>
+    <template v-if="result">
+      <v-data-table
+        :headers="headers"
+        :items="results"
+        :search="search"
+        class="elevation-1 mt-8"
+        :loading="loadTable"
+        loading-text="Cargando... Por favor, espere"
+        mobile-breakpoint="600"
+      >
+        <template v-slot:top>
+          <v-toolbar flat>
+            <v-toolbar-title
+              >{{ titleTable }} del trayecto
+              {{ trayectoSelected }}</v-toolbar-title
+            >
+            <v-divider class="mx-4" inset vertical></v-divider>
+            <v-text-field
+              v-model="search"
+              append-icon="mdi-magnify"
+              label="Buscar"
+              single-line
+              hide-details
+            ></v-text-field>
+            <v-spacer></v-spacer>
+          </v-toolbar>
+        </template>
+        <template v-slot:no-data>
+          <v-alert outlined color="black" class="mt-4">
+            <div>No hay {{ title }}</div>
+          </v-alert>
+        </template>
+      </v-data-table>
+    </template>
   </div>
 </template>
 
@@ -30,9 +68,27 @@
 
     data: () => ({
       title: 'Buses de un trayecto - Porcentaje de capacidad vendida',
+      titleTable: 'Resultados',
       url: 'http://127.0.0.1:8000',
+      valid: true,
       trayectos: [],
-      customTrayectos: []
+      customTrayectos: [],
+      trayectoSelected: '',
+      porcentajeCapacidad: '',
+      results: [],
+      search: '',
+      headers: [
+        { text: 'Placa de bus', value: 'bus.placa' },
+        { text: 'Dni del chofer', value: 'bus.chofer.dni' },
+        { text: 'Porcentaje de capacidad vendida', value: 'porcentaje' }
+      ],
+      loadTable: true,
+      result: false,
+      trayectosRules: [(v) => !!v || 'Es necesario seleccionar los trayectos'],
+      porcentajeRules: [
+        (v) => !!v || 'El porcentaje es requerido',
+        (v) => (v && v.length <= 100) || 'El porcentaje debe ser menor que 100'
+      ]
     }),
 
     mounted() {
@@ -73,24 +129,51 @@
           }
         }
 
-        // console.log(busesYPorcentajes)
-
         return busesYPorcentajes
       },
       async getTrayectos() {
         this.trayectos = (await axios.get(this.url + '/api/trayecto/')).data
-        console.log(this.trayectos)
+      },
+      submit() {
+        if (this.$refs.form.validate()) {
+          let trayectos = this.trayectoSelected.split(' ')
+          let partida = trayectos[0]
+          let llegada = trayectos[2]
 
-        for (let trayecto of this.trayectos) {
-          if (
-            trayecto.lugar_partida == 'Lima' &&
-            trayecto.lugar_llegada == 'Cusco'
-          ) {
-            this.customTrayectos.push(trayecto)
+          for (let trayecto of this.trayectos) {
+            if (
+              trayecto.lugar_partida == partida &&
+              trayecto.lugar_llegada == llegada
+            ) {
+              this.customTrayectos.push(trayecto)
+            }
           }
-        }
 
-        this.getBusesYPorcentajes(this.customTrayectos, 20)
+          let busPorcentaje = this.getBusesYPorcentajes(
+            this.customTrayectos,
+            this.porcentajeCapacidad
+          )
+
+          busPorcentaje
+            .then((res) => {
+              console.log(res)
+              this.results = res
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+
+          this.result = true
+          this.loadTable = false
+        }
+      },
+      clear() {
+        this.trayectoSelected = ''
+        this.porcentajeCapacidad = ''
+        this.result = false
+      },
+      validate() {
+        this.$refs.form.validate()
       }
     }
   }

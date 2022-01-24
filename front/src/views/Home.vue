@@ -74,6 +74,10 @@
         {
           name: 'trayectos-pasajeros-promedio',
           path: '/metricas-trayectos-promedio-pasajeros'
+        },
+        {
+          name: 'trayecto-buses-porcentaje',
+          path: '/metricas-buses-porcentajes'
         }
       ],
       drawer: false,
