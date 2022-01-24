@@ -49,7 +49,7 @@
                       <v-select
                         id="chofer_id"
                         v-model="newBus.chofer_id"
-                        label="id del chofer*"
+                        label="Selecciona al chofer*"
                         :items="choferesAddOpts"
                         :rules="selectRules"
                         required
@@ -105,7 +105,7 @@
                       <v-select
                         id="chofer_id"
                         v-model="currentBus.chofer_id"
-                        label="id del chofer*"
+                        label="Selecciona al chofer*"
                         :items="choferesAddOpts"
                         :rules="selectRules"
                         required
@@ -237,7 +237,6 @@
           })
       },
       addBus() {
-        console.log(this.newBus)
         if (this.$refs.form.validate()) {
           this.newBus.chofer_id = this.newBus.chofer_id.split(' ')[0]
           axios

@@ -5,8 +5,8 @@ import About from '../components/About.vue'
 import Bus from '../components/Bus.vue'
 import Pasajero from '../components/Pasajero.vue'
 import Trayecto from '../components/Trayecto.vue'
-import Viajes from '../components/Viajes.vue'
-import Metricas from '../components/Metricas.vue'
+import Viaje from '../components/Viaje.vue'
+//import Metricas from '../components/Metricas.vue'
 
 Vue.use(VueRouter)
 
@@ -39,13 +39,13 @@ const routes = [
   {
     path: '/viajes',
     name: 'Viajes',
-    component: Viajes
-  },
-  {
-    path: '/metricas',
-    name: 'Metricas',
-    component: Metricas
+    component: Viaje
   }
+  //{
+  //  path: '/metricas',
+  //  name: 'Metricas',
+  //  component: Metricas
+  //}
 ]
 
 const router = new VueRouter({

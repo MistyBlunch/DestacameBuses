@@ -3,6 +3,7 @@ from django.core import serializers
 from rest_framework.response import Response
 from .models import Bus, Chofer, Viaje, Pasajero, Trayecto, Asiento
 from .serializers import BusSerializer, ViajeSerializer, PasajeroSerializer, TrayectoSerializer, AsientoSerializer
+from django.db.models import Count
 import datetime
 import json
 
@@ -60,13 +61,20 @@ class PasajerosDetailsApiView(APIView):
 
 class TrayectosDetailsApiView(APIView):
   def get(self, request, format=None):
-    trayectos = Trayecto.objects.distinct('lugar_partida','lugar_llegada')
-    serializer = TrayectoSerializer(trayectos, many=True)
+    trayectos_distinct = Trayecto.objects.distinct('lugar_partida','lugar_llegada')
+    trayectos = Trayecto.objects.all()
+    serializer_trayectos = TrayectoSerializer(trayectos, many=True)
+    serializer_trayectos_distinct = TrayectoSerializer(trayectos_distinct, many=True)
 
-    for i in serializer.data:
+    for i in serializer_trayectos.data:
       i['bus']['chofer']['dni_nombre'] = i['bus']['chofer']['dni'] + ' - ' + i['bus']['chofer']['nombre'] + ' ' + i['bus']['chofer']['apellido']
       i['partida_destino'] = i['lugar_partida'] + ' - ' + i['lugar_llegada']
-    return Response(serializer.data, status=200)
+
+    for i in serializer_trayectos_distinct.data:
+      i['bus']['chofer']['dni_nombre'] = i['bus']['chofer']['dni'] + ' - ' + i['bus']['chofer']['nombre'] + ' ' + i['bus']['chofer']['apellido']
+      i['partida_destino'] = i['lugar_partida'] + ' - ' + i['lugar_llegada']
+
+    return Response({'trayectos': serializer_trayectos.data, 'trayectos_distinct': serializer_trayectos_distinct.data}, status=200)
 
 
 class TrayectosPartidaLlegadaHorasApiView(APIView):
@@ -96,13 +104,3 @@ class AsientosAvailablesApiView(APIView):
 
     return Response(serializer.data, status=200)
 
-
-class TrayectosPromediosPasajerosApiView(APIView):
-  def get(request, self, format=None):
-    data = []
-    # queryset = Trayecto.objects.filter(lugar_partida__iexact=partida, lugar_llegada__iexact=llegada)
-    queryset = Trayecto.objects.all()
-    serializer = TrayectoSerializer(queryset, many=True)
-
-    data_json = json.dumps(data)
-    return Response(serializer.data, status=200)

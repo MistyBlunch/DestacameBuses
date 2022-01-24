@@ -53,7 +53,7 @@
                         :items="trayectoPartidaDestino"
                         item-value="id"
                         item-text="partidaDestino"
-                        :rules="pasajeroRules"
+                        :rules="trayectoRules"
                         required
                         return-object
                       ></v-select>
@@ -64,7 +64,7 @@
                         :items="trayectoHoras"
                         item-value="id"
                         item-text="horario"
-                        :rules="pasajeroRules"
+                        :rules="horarioRules"
                         required
                       ></v-select>
                       <v-text-field
@@ -81,7 +81,7 @@
                         :items="asientosOpts"
                         item-value="id"
                         item-text="numero"
-                        :rules="pasajeroRules"
+                        :rules="asientoRules"
                         required
                         return-object
                       ></v-select>
@@ -134,7 +134,7 @@
                         :items="trayectoPartidaDestino"
                         item-value="id"
                         item-text="partidaDestino"
-                        :rules="pasajeroRules"
+                        :rules="trayectoRules"
                         required
                         return-object
                       ></v-select>
@@ -145,7 +145,7 @@
                         :items="trayectoHoras"
                         item-value="id"
                         item-text="horario"
-                        :rules="pasajeroRules"
+                        :rules="horarioRules"
                         required
                       ></v-select>
                       <v-text-field
@@ -162,7 +162,7 @@
                         :items="asientosOpts"
                         item-value="id"
                         item-text="numero"
-                        :rules="pasajeroRules"
+                        :rules="asientoRules"
                         required
                         return-object
                       ></v-select>
@@ -240,7 +240,10 @@
       },
       valid: true,
       loadTable: true,
-      pasajeroRules: [(v) => !!v || 'Es necesario seleccionar un pasajero']
+      pasajeroRules: [(v) => !!v || 'Es necesario seleccionar un pasajero'],
+      trayectoRules: [(v) => !!v || 'Es necesario seleccionar un trayecto'],
+      horarioRules: [(v) => !!v || 'Es necesario seleccionar un horario'],
+      asientoRules: [(v) => !!v || 'Es necesario seleccionar un asiento']
     }),
 
     mounted() {
@@ -287,7 +290,7 @@
         axios
           .get(this.url + '/api/trayectos-details/')
           .then((response) => {
-            this.trayectos = response.data
+            this.trayectos = response.data.trayectos_distinct
             this.trayectos.map((trayecto) => {
               this.trayectoPartidaDestino.push({
                 id: trayecto.id,
@@ -309,7 +312,7 @@
         axios
           .get(
             this.url +
-              `/api/trayectos-partida-llegada-horas/${partida}&${llegada}`
+              `/api/trayectos-partida-llegada-horas/${partida}&${llegada}/`
           )
           .then((response) => {
             this.trayectoHoras = response.data.results
@@ -336,9 +339,18 @@
       },
       getAsientos(id) {
         axios
-          .get(this.url + `/api/asientos-availables/${id}`)
+          .get(this.url + `/api/asientos-availables/${id}/`)
           .then((response) => {
             this.asientos = response.data
+            this.asientos.sort((a, b) => {
+              if (a.numero < b.numero) {
+                return -1
+              }
+              if (a.numero > b.numero) {
+                return 1
+              }
+              return 0
+            })
             this.asientos.map((asiento) => {
               this.asientosOpts.push({ id: asiento.id, numero: asiento.numero })
             })

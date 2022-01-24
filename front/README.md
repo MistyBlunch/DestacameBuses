@@ -6,7 +6,7 @@ Descarga el repositorio
 ```bash
 git clone https://github.com/MistyBlunch/DestacameBuses.git
 ```
-Ingresa al repositorio (back)
+Ingresa al repositorio (front)
 ```bash
 cd DestacameBuses/front/
 ```

@@ -56,7 +56,7 @@
                       <v-text-field
                         id="lugar_llegada"
                         v-model="newTrayecto.lugar_llegada"
-                        label="Lugar de llegada"
+                        label="Lugar de llegada*"
                         :counter="50"
                         :rules="lugarLlegadaRules"
                         required
@@ -172,7 +172,7 @@
                       <v-text-field
                         id="lugar_llegada"
                         v-model="currentTrayecto.lugar_llegada"
-                        label="Lugar de llegada"
+                        label="Lugar de llegada*"
                         :counter="50"
                         :rules="lugarLlegadaRules"
                         required
@@ -334,7 +334,7 @@
         axios
           .get(this.url + '/api/trayectos-details/')
           .then((response) => {
-            this.trayectos = response.data
+            this.trayectos = response.data.trayectos
             if (!this.trayectos) console.log('No hay trayectos')
             else this.loadTable = false
             this.getBuses()
@@ -381,6 +381,7 @@
           this.newTrayecto.bus_id = this.bus_id[0].id
           this.newTrayecto.horario =
             this.newTrayecto.date + ' ' + this.newTrayecto.time + ':00'
+
           delete this.newTrayecto.date
           delete this.newTrayecto.time
 
