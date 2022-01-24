@@ -6,7 +6,8 @@ import Bus from '../components/Bus.vue'
 import Pasajero from '../components/Pasajero.vue'
 import Trayecto from '../components/Trayecto.vue'
 import Viaje from '../components/Viaje.vue'
-//import Metricas from '../components/Metricas.vue'
+import MetricasTrayectosPromedioPasajeros from '../components/MetricasTrayectosPromedioPasajeros.vue'
+import MetricasBusesPorcentajes from '../components/MetricasBusesPorcentajes.vue'
 
 Vue.use(VueRouter)
 
@@ -40,12 +41,17 @@ const routes = [
     path: '/viajes',
     name: 'Viajes',
     component: Viaje
+  },
+  {
+    path: '/metricas-trayectos-promedio-pasajeros',
+    name: 'Metricas Trayectos Promedio Pasajeros',
+    component: MetricasTrayectosPromedioPasajeros
+  },
+  {
+    path: '/metricas-buses-porcentajes',
+    name: 'Metricas Buses Prorcentajes',
+    component: MetricasBusesPorcentajes
   }
-  //{
-  //  path: '/metricas',
-  //  name: 'Metricas',
-  //  component: Metricas
-  //}
 ]
 
 const router = new VueRouter({

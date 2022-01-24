@@ -70,11 +70,11 @@
         {
           name: 'viajes',
           path: '/viajes'
+        },
+        {
+          name: 'trayectos-pasajeros-promedio',
+          path: '/metricas-trayectos-promedio-pasajeros'
         }
-        //{
-        //  name: 'metricas',
-        //  path: '/metricas'
-        //}
       ],
       drawer: false,
       group: null
